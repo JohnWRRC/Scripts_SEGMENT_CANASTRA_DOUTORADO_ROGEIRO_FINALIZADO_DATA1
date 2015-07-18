@@ -1,0 +1,30 @@
+setwd('F:\\data\\john_pc2\\rogerio\\Imagens_Rapid_Eye_Canastra\\grass\\temp')
+
+require(foreign)
+lista=list.files(pattern="*.dbf")
+
+
+i=1
+for (i in lista){
+	print(i)
+			
+	dados<-read.dbf(i)
+	head(dados)
+	deletar1<-grep("_n", colnames(dados))	
+	dados2<-dados [,-deletar1]
+	deletar2<-grep("_sum", colnames(dados2))
+	dados2<-dados2[,-deletar2]
+	dados2<-dados2[,-c(1,2,3)]
+	dados3<-dados2[,c(grep("_mean", colnames(dados2))  , grep("_stdd", colnames(dados2))  )]
+	dados3.scale<-scale(dados3)
+	fit <- kmeans(dados3.scale, 10) 
+	aggregate(dados3.scale,by=list(fit$cluster),FUN=mean)	
+	# append cluster assignment
+	dados3.scale <- data.frame(dados3.scale, fit$cluster) 
+	write.dbf(dados3.scale,i)
+}	
+
+
+
+
+

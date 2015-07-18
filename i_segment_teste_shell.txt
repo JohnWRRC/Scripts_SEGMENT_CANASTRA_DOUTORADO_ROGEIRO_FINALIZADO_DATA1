@@ -1,0 +1,35 @@
+cd "F:\data\john_pc2\rogerio\Imagens_Rapid_Eye_Canastra\grass\shp_mascaras"
+v.in.ogr dsn=mask_Project.shp out=mask_Project_shp -o --o
+v.in.ogr dsn=PoligonoII_arlobo.shp out=PoligonoII_arlobo_shp -o --o
+
+i.group group=G4 subgroup=G44 in=2329809_2011-06-15T140628_RE4_3A-NAC_9977600_139975_0_tif.1,2329809_2011-06-15T140628_RE4_3A-NAC_9977600_139975_0_tif.2,2329809_2011-06-15T140628_RE4_3A-NAC_9977600_139975_0_tif.3
+
+
+i.segment group=G4 output=2329809_2011-06-15T140628_RE4_3A-NAC_9977600_139975_0_tif_segment_thre025_min0200 threshold=0.25 minsize=200 --o
+	
+i.segment group=G04 output=2329809_2011-06-15T140628_RE4_3A-NAC_9977600_139975_0_tif_segment_thre015_min0100 threshold=0.15 minsize=100 --o --verbose
+
+
+r.to.vect input=ortho2012-06-27t140311_re1_1b-nac_11210184_150565_tif_segment_thre015_min0100  output=segment_thre015_min0100 type=area --o --verbose
+   
+
+
+cd "I:\Rapdeye\grass_v02"
+ v.out.ogr input=segment_thre015_min0100 dsn=segment_thre015_min0100.shp type=area
+
+r=`g.mlist pattern="(*)" sep="comma"`
+g.remove rast=$r
+
+
+
+r=`g.mlist vect pattern="(*)" sep="comma"`
+g.remove -f vect=$r
+
+
+a=`r.stats -`
+echo $a
+
+g.region rast=pontos_amostrais_rast_buff_50m_img
+r.mapcalc 'source=if(pontos_amostrais_rast_buff_50m_img!=3,null(),3)'
+r.mapcalc 'target=if(pontos_amostrais_rast_buff_50m_img!=2,null(),2)'
+
